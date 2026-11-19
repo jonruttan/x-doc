@@ -1,5 +1,7 @@
 # x-doc
 
+<p align="center"><img src="docs/bitwise-banner.svg" alt="x-doc, with Bitwise the owl" width="100%"></p>
+
 Documents shown, described and converted, written in
 [x-lang](https://github.com/jonruttan/x-lang) and loaded as a lang.  It
 reads Markdown, HTML, PDF and plain text, and writes each of them.
