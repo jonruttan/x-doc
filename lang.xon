@@ -1,0 +1,13 @@
+; lang.xon -- what this bundle is.
+
+(lang "doc")
+
+; Self-contained: this bundle depends on nothing but the platform.
+;
+; Helium, plus exactly the libraries this bundle imports and nothing
+; ambient: the document formats, the terminal and files, none of the tower.
+(dialect he)
+
+(requires-release "v0.58.0")
+
+(entry "run.x")
