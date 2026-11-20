@@ -35,7 +35,15 @@ doc-info says what it is, and doc-convert writes it in another format.
 (write (list (doc-info "tests/fixtures/hello.pdf" ()) (doc-info "tests/fixtures/notes.md" ()) (doc-info "tests/fixtures/plain.txt" ())))
 ```
 ---
-    ("file     tests/fixtures/hello.pdf\nformat   pdf\ntitle    Fixture title\npages    1\nheadings 1\nwords    27\n" "file     tests/fixtures/notes.md\nformat   markdown\ntitle    Notes\nheadings 2\nwords    14\n" "file     tests/fixtures/plain.txt\nformat   text\nheadings 0\nwords    5\n")
+    ("file     tests/fixtures/hello.pdf\nformat   pdf\ntitle    Fixture title\npages    1\nheadings 1\nwords    26\n" "file     tests/fixtures/notes.md\nformat   markdown\ntitle    Notes\nheadings 2\nwords    13\n" "file     tests/fixtures/plain.txt\nformat   text\nheadings 0\nwords    5\n")
+
+### a word set in two styles is one word, and a line end parts two
+
+```doc
+(write (doc-info "tests/fixtures/words.md" ()))
+```
+---
+    "file     tests/fixtures/words.md\nformat   markdown\nheadings 0\nwords    6\n"
 
 ## converting
 
