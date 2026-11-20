@@ -6,6 +6,6 @@
 ; @copyright 2026 Jon Ruttan
 ; @license MIT No Attribution (MIT-0)
 
-(provide doc/base doc-version doc-main doc-options doc-open doc-info doc-convert doc-input)
+(provide doc/base doc-version doc-main doc-options doc-open doc-info doc-convert doc-input doc-edit)
 
-(import doc/cli doc-version doc-main doc-options doc-open doc-info doc-convert doc-input)
+(import doc/cli doc-version doc-main doc-options doc-open doc-info doc-convert doc-input doc-edit)

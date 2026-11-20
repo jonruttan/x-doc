@@ -10,6 +10,7 @@ reads Markdown, HTML, PDF and plain text, and writes each of them.
     x -l doc -- -i FILE
     x -l doc -- FILE OUTPUT
     x -l doc -- -t FORMAT FILE [OUTPUT]
+    x -l doc -- -e FILE [OUTPUT]
     x -l doc -- -l | -V | -h
 
 ## Showing
@@ -40,6 +41,25 @@ and with no output file the document goes to standard output.
     x -l doc -- paper.pdf paper.md
     x -l doc -- notes.md notes.pdf
     x -l doc -- -t html notes.md > notes.html
+
+## Editing
+
+`-e`, `--edit`, opens the document in an editor as Markdown and writes
+what the editor leaves in the document's own format: over the file, or
+to an output file when one is given, in that file's format.  The editor
+is `$VISUAL`, else `$EDITOR`, else `vi`.
+
+    x -l doc -- -e paper.pdf
+    x -l doc -- -e page.html notes.md
+
+Nothing is written when the text is left as it was or the editor ends
+with an error.  A Markdown or a text file edited in place is given to
+the editor as it is.
+
+A file edited in place is written again whole, by the format's writer:
+a PDF keeps its text, its headings and its lists, and loses its layout,
+its fonts and whatever the reader does not read.  An output file leaves
+the first as it was.
 
 ## Formats
 
