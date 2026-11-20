@@ -66,15 +66,16 @@ doc-info says what it is, and doc-convert writes it in another format.
 ---
     ("# A PDF fixture\n\nThis paragraph is set on two lines, the first reaching the margin and a word broken across them, in **bold**.\n\nA second paragraph.\n" "# Page\n\nSome **bold** text.\n")
 
-### Markdown as a PDF, read back: the title is the first heading
+### Markdown as a PDF, read back: a PDF, its title the first heading, and its text as it was
 
 ```doc
 (import x/codec/document)
 (def out (doc-convert "tests/fixtures/notes.md" () "pdf" 80))
-(write (list (Document format "out" (first out)) (Document read "pdf" (first out) (List ref 2 out))))
+(def back (Document read "pdf" (first out) (List ref 2 out)))
+(write (list (Document format "out" (first out)) (first back) (first (Document write "text" (rest back) () 80))))
 ```
 ---
-    ("pdf" ("Notes" ('heading 1 ("Notes")) ('paragraph ("A " ('emph ("small")) " document with a link and " ('code "code") ".")) ('list #f () #t ((('paragraph ("one"))) (('paragraph ("two"))))) ('heading 2 ("More")) ('paragraph ("quoted"))))
+    ("pdf" "Notes" "Notes\n\nA small document with a link and code.\n\n• one\n• two\n\nMore\n\nquoted\n")
 
 ## standard input
 
