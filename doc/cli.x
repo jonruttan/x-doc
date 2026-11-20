@@ -104,7 +104,7 @@
 ; The document at PATH: (FORMAT TITLE . BLOCKS).
 (def doc-open (fn (_ path format) (rest (%load path format))))
 
-; The strings a document's text is made of, in order.
+; The strings an inline run is made of, in order; a line end is a space.
 (def %inline-texts
   (fn (self inlines)
     (List flat-map
@@ -113,14 +113,17 @@
                ((eq? (first x) (lit code)) (list (List ref 1 x)))
                ((match ((eq? (first x) (lit emph)) #t) (#t (eq? (first x) (lit strong)))) (self (List ref 1 x)))
                ((match ((eq? (first x) (lit link)) #t) (#t (eq? (first x) (lit image)))) (self (List ref 3 x)))
+               ((match ((eq? (first x) (lit softbreak)) #t) (#t (eq? (first x) (lit hardbreak)))) (list " "))
                (#t ())))
       inlines)))
+; The text of each block that holds text: a heading's or a paragraph's
+; inlines joined, so a word set in two styles is one word.
 (def %block-texts
   (fn (self blocks)
     (List flat-map
       (fn (_ b)
-        (match ((eq? (first b) (lit heading)) (%inline-texts (List ref 2 b)))
-               ((eq? (first b) (lit paragraph)) (%inline-texts (List ref 1 b)))
+        (match ((eq? (first b) (lit heading)) (list (Str8 join "" (%inline-texts (List ref 2 b)))))
+               ((eq? (first b) (lit paragraph)) (list (Str8 join "" (%inline-texts (List ref 1 b)))))
                ((eq? (first b) (lit code-block)) (list (List ref 2 b)))
                ((eq? (first b) (lit block-quote)) (self (List ref 1 b)))
                ((eq? (first b) (lit list)) (List flat-map (fn (_ item) (self item)) (List ref 4 b)))
