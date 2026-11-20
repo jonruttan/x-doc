@@ -7,6 +7,7 @@ x -l doc -- FILE
 x -l doc -- -i FILE
 x -l doc -- FILE OUTPUT
 x -l doc -- -t FORMAT FILE [OUTPUT]
+x -l doc -- -e FILE [OUTPUT]
 printf '*a* b\n' | x -l doc -- -f markdown - -> a b
 printf '<h1>Hi</h1>' | x -l doc -- -f html -t markdown - -> # Hi
 printf '# Hi\n' | x -l doc -- -f markdown -t html - | grep h1 -> <h1>Hi</h1>
@@ -31,6 +32,7 @@ x -l doc -- none.md 2>/dev/null; echo $? -> 1
 | `-t FORMAT` | writes the document as FORMAT, to OUTPUT or standard out  |
 | `-f FORMAT` | reads FILE as FORMAT, whatever its name                   |
 | `-i`        | prints the format, title, a PDF's pages, headings, words  |
+| `-e`        | edits it as Markdown in `$VISUAL`, `$EDITOR` or `vi`       |
 | `-l`        | prints the formats and the endings each is known by       |
 | `-w N`      | columns of text; the terminal's or 80 unless given        |
 | `-V` `-h`   | the version; the help                                     |
@@ -65,6 +67,7 @@ x -l doc -- none.md 2>/dev/null; echo $? -> 1
 |------------------------------------------|---------------------------------|
 | a PDF read back has a nested list flat   | structure kept                  |
 | an HTML table is a paragraph a row       | a table                         |
+| `-e` on a PDF writes it again whole      | the layout kept                 |
 | piped input is text unless `-f` says     | Markdown assumed                |
 
 ## More

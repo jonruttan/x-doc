@@ -10,6 +10,7 @@
 ;   x -l doc -- -i FILE                 what the document is
 ;   x -l doc -- FILE OUTPUT             the document written as OUTPUT's format
 ;   x -l doc -- -t FORMAT FILE          the document written as FORMAT
+;   x -l doc -- -e FILE [OUTPUT]        the document edited as Markdown
 ;
 ; The formats are the platform's: (Document formats) names them, (Document
 ; read) reads a file as one and (Document write) writes one.  A file's
@@ -36,6 +37,7 @@
     (list (Opts arg "-t" "--to" "FORMAT" "Write the document as FORMAT, to OUTPUT or standard output")
           (Opts arg "-f" "--from" "FORMAT" "Read FILE as FORMAT, whatever its name")
           (Opts flag "-i" "--info" "Print the document's format, title and size, and exit")
+          (Opts flag "-e" "--edit" "Edit the document as Markdown in $VISUAL, $EDITOR or vi, and write it back, to OUTPUT if given")
           (Opts flag "-l" "--list" "Print the formats and the endings each is known by, and exit")
           (Opts arg "-w" "--width" "N" "Columns of text: the terminal's, or 80, unless given; 10 at least")
           (Opts flag "-V" "--version" "Print the version and exit")
@@ -198,6 +200,65 @@
     (File close fd)
     (unless (null? failed) (error failed))))
 
+; --- editing -----------------------------------------------------------------
+
+; The editor's command as words: $VISUAL, else $EDITOR, else vi.
+(def %editor
+  (fn (_)
+    (def named
+      (fn (_ name) ((fn (_ v) (match ((null? v) ()) ((str=? (Str8 trim v) "") ()) (#t v))) (guard (e ()) (Sys getenv name)))))
+    (def command (match ((not (null? (named "VISUAL"))) (named "VISUAL")) ((not (null? (named "EDITOR"))) (named "EDITOR")) (#t "vi")))
+    (List filter (fn (_ w) (not (str=? w ""))) (Str8 split " " command))))
+
+; A new file for the editor, its name ending .md so an editor knows what
+; it holds: its path.
+(def %scratch
+  (fn (_)
+    (def made (File temp (Str8 append ((fn (_ d) (match ((null? d) "/tmp") (#t d))) (guard (e ()) (Sys getenv "TMPDIR"))) "/x-doc-")))
+    (File close (first made))
+    (File rename (rest made) (Str8 append (rest made) ".md"))
+    (Str8 append (rest made) ".md")))
+
+; EDITOR, a command as words, run on PATH: how it ended.
+(def %run
+  (fn (_ editor path)
+    (import x/sys/proc)
+    (Proc run! (List append editor (list path)))))
+
+; The document at PATH edited as Markdown by EDITOR and written back: to
+; OUTPUT, or over PATH when OUTPUT is nil, as the format TO names or, TO
+; nil, as the name written to says.  The document is written as Markdown
+; to a file of its own, the editor is run on it, and what it leaves is
+; read and written in the format; when it leaves the text as it was, or
+; ends with a status other than 0, nothing is written.  A Markdown or a
+; text file edited in place is given to the editor as it is.  Answers
+; (STATUS . WROTE?).
+(def doc-edit
+  (fn (_ path from to output editor width)
+    (def doc (doc-open path from))
+    (def format (match ((not (null? to)) to)
+                       ((null? output) (first doc))
+                       (#t ((fn (_ f) (match ((null? f) "text") (#t f))) (Document format output)))))
+    (def plain? (match ((str=? format "markdown") #t) (#t (str=? format "text"))))
+    (match
+      ((match ((null? output) (match ((str=? format (first doc)) plain?) (#t #f))) (#t #f))
+        ((fn (_ before)
+           (def status (%run editor path))
+           (pair status (match ((= status 0) (not (str=? before (File read-all path)))) (#t #f))))
+         (File read-all path)))
+      (#t
+        ((fn (_ scratch before)
+           (File write-all scratch before)
+           (def status (%run editor scratch))
+           (def after (File read-all scratch))
+           (File unlink scratch)
+           (match ((not (= status 0)) (pair status #f))
+                  ((str=? before after) (pair 0 #f))
+                  (#t (do (%save (match ((null? output) path) (#t output))
+                                 (Document write format (rest (Document read "markdown" after)) (first (rest doc)) width))
+                          (pair 0 #t)))))
+         (%scratch) (first (Document write "markdown" (rest (rest doc)))))))))
+
 ; The terminal's columns, 80 when it will not say or says fewer than 10.
 (def %terminal
   (fn (_)
@@ -246,16 +307,30 @@
       ((match ((null? given) #f) ((null? width) #t) (#t (< width 10)))
         (refuse "--width takes a number of columns, 10 or more"))
       ((match ((null? files) #t) (#t (< 2 (List length files)))) (do (%say 2 (Opts usage doc-options)) 2))
+      ((match ((Opts on? opts "-e") (str=? (first files) "-")) (#t #f))
+        (refuse "--edit takes a file, not standard input"))
       ((match ((not (null? to)) #f) ((null? (rest files)) #f) (#t (null? (Document format (first (rest files))))))
         (refuse (Str8 append "no format is known by this name, name one with --to: " (first (rest files)))))
       (#t
         (guard (e (do (%say 2 (Str8 append "x-doc: " (%err-text e) ": " (first files) "\n")) 1))
           (match
             ((Opts on? opts "-i") (do (%say 1 (doc-info (first files) from)) 0))
+            ((Opts on? opts "-e")
+              ; The launcher holds descriptor 0 and the terminal waits on 3:
+              ; it is taken back, so the editor has it.
+              (do (guard (e ()) (do (Sys dup2 3 0) (Sys close 3)))
+                  ((fn (_ ended)
+                     (match ((= (first ended) 0) 0)
+                            (#t (do (%say 2 (Str8 append "x-doc: the editor ended with status " (%number->str (first ended))
+                                                         ", and nothing was written: " (first files) "\n"))
+                                    1))))
+                   (doc-edit (first files) from to
+                             (match ((null? (rest files)) ()) (#t (first (rest files))))
+                             (%editor) (match ((null? width) 80) (#t width))))))
             (#t
               ((fn (_ output)
                  ((fn (_ file) (match ((null? output) (%emit 1 file)) (#t (%save output file))) 0)
                   (doc-convert (first files) from (%target to output) (%columns width))))
                (match ((null? (rest files)) ()) (#t (first (rest files))))))))))))
 
-(provide doc/cli doc-version doc-main doc-options doc-open doc-info doc-convert doc-input)
+(provide doc/cli doc-version doc-main doc-options doc-open doc-info doc-convert doc-input doc-edit)
