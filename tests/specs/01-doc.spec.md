@@ -74,7 +74,7 @@ doc-info says what it is, and doc-convert writes it in another format.
 (write (list (Document format "out" (first out)) (Document read "pdf" (first out) (List ref 2 out))))
 ```
 ---
-    ("pdf" ("Notes" ('heading 1 ("Notes")) ('paragraph ("A " ('emph ("small")) " document with a link and " ('code "code") ".")) ('paragraph ("• one")) ('paragraph ("• two")) ('heading 2 ("More")) ('paragraph ("quoted"))))
+    ("pdf" ("Notes" ('heading 1 ("Notes")) ('paragraph ("A " ('emph ("small")) " document with a link and " ('code "code") ".")) ('list #f () #t ((('paragraph ("one"))) (('paragraph ("two"))))) ('heading 2 ("More")) ('paragraph ("quoted"))))
 
 ## standard input
 

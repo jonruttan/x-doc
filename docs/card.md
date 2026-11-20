@@ -63,7 +63,7 @@ x -l doc -- none.md 2>/dev/null; echo $? -> 1
 
 | Here                                     | In a converter you may know     |
 |------------------------------------------|---------------------------------|
-| a PDF read back has lists as paragraphs  | structure kept                  |
+| a PDF read back has a nested list flat   | structure kept                  |
 | an HTML table is a paragraph a row       | a table                         |
 | piped input is text unless `-f` says     | Markdown assumed                |
 
