@@ -66,7 +66,7 @@ the first as it was.
 | Format | Endings | Read as | Written as |
 |---|---|---|---|
 | `markdown` | `.md` `.markdown` `.mdown` | CommonMark | CommonMark |
-| `html` | `.html` `.htm` | Its headings, paragraphs, lists, quotes, code and links; a table a paragraph a row | A page under the document's title |
+| `html` | `.html` `.htm` | Its headings, paragraphs, lists, quotes, code, links and tables | A page under the document's title |
 | `pdf` | `.pdf` | Its text as headings and paragraphs, bold and italic kept | US Letter pages in Helvetica and Courier |
 | `text` | `.txt` `.text` | One block that keeps its lines | The document laid out in columns |
 
@@ -94,7 +94,7 @@ read or the output written, 2 for a command line refused.
 
     make install
 
-copies the bundle to `<share>/langs/doc`, where `x -l doc` finds it.
+copies the bundle to `<share>/bundles/doc`, where `x -l doc` finds it.
 `make check` runs the spec suite.
 
 ## License

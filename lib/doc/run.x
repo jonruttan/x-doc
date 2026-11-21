@@ -1,12 +1,17 @@
 ; # x-doc -- documents shown and converted on x-lang
 ;
-; ## run.x -- the entry
+; ## lib/doc/run.x -- the entry, the module doc/run
 ;
 ; @description `x -l doc -- [OPTIONS] FILE [OUTPUT]`.
 ; @author [Jon Ruttan](jonruttan@gmail.com)
 ; @copyright 2026 Jon Ruttan
 ; @license MIT No Attribution (MIT-0)
-(import doc/base)
+;
+; Importing it sets the session up and starts nothing; main runs the
+; command the operands spell, and with none leaves the prompt to the
+; wrapper.
+(module doc/run)
+(import doc/base doc-main)
 
 (set! %lang-name "doc")
 (set! %repl-prompt "doc> ")
@@ -18,5 +23,10 @@
   (fn (_ a) (List any? (fn (_ f) (str=? a f)) (list "--batch" "--quiet" "--no-color"))))
 (def %operands
   (fn (self l) (if (if (null? l) #f (%engine-flag? (first l))) (self (rest l)) l)))
-(let ((ops (%operands (rest (Sys args (lit program))))))
-  (unless (null? ops) (Sys exit (doc-main ops))))
+
+(def main
+  (fn (_)
+    (let ((ops (%operands (rest (Sys args (lit program))))))
+      (unless (null? ops) (Sys exit (doc-main ops))))))
+
+(provide doc/run main)

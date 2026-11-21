@@ -1,6 +1,6 @@
 ; # x-doc -- documents shown and converted on x-lang
 ;
-; ## doc/cli.x -- the command line
+; ## lib/doc/cli.x -- the command line
 ;
 ; @author [Jon Ruttan](jonruttan@gmail.com)
 ; @copyright 2026 Jon Ruttan
