@@ -1,6 +1,6 @@
 ; # x-doc -- documents shown and converted on x-lang
 ;
-; ## doc/base.x -- what the entry and the specs reach
+; ## lib/doc/base.x -- what the entry and the specs reach
 ;
 ; @author [Jon Ruttan](jonruttan@gmail.com)
 ; @copyright 2026 Jon Ruttan
