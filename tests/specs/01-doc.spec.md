@@ -45,6 +45,14 @@ doc-info says what it is, and doc-convert writes it in another format.
 ---
     "file     tests/fixtures/words.md\nformat   markdown\nheadings 0\nwords    6\n"
 
+### a table's words are its cells', a cell's styles joined and a bar parting two
+
+```doc
+(write (doc-info "tests/fixtures/table.md" ()))
+```
+---
+    "file     tests/fixtures/table.md\nformat   markdown\nheadings 0\nwords    5\n"
+
 ## converting
 
 ### Markdown as HTML, as text at a width, and as Markdown again
