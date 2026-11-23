@@ -118,8 +118,8 @@
                ((match ((eq? (first x) (lit softbreak)) #t) (#t (eq? (first x) (lit hardbreak)))) (list " "))
                (#t ())))
       inlines)))
-; The text of each block that holds text: a heading's or a paragraph's
-; inlines joined, so a word set in two styles is one word.
+; The text of each block that holds text: a heading's, a paragraph's or
+; a table cell's inlines joined, so a word set in two styles is one word.
 (def %block-texts
   (fn (self blocks)
     (List flat-map
@@ -129,6 +129,8 @@
                ((eq? (first b) (lit code-block)) (list (List ref 2 b)))
                ((eq? (first b) (lit block-quote)) (self (List ref 1 b)))
                ((eq? (first b) (lit list)) (List flat-map (fn (_ item) (self item)) (List ref 4 b)))
+               ((eq? (first b) (lit table))
+                 (List flat-map (fn (_ row) (List map (fn (_ cell) (Str8 join "" (%inline-texts cell))) row)) (List ref 3 b)))
                (#t ())))
       blocks)))
 (def %headings
